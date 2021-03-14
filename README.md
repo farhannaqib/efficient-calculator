@@ -1,3 +1,3 @@
 # efficient-calculator
 
-This is a joke.
+This is a good calculator.
