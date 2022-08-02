@@ -1,11 +1,11 @@
 from tkinter import *
 from calculator import solveeq
-import time
 
-#COLORS
-LIGHT_GRAY = "#f5f5f5"
+#color constants
+LIGHT_GRAY = "#f6f6fb"
 BLACK = "#28282B"
 WHITE = "#ffffff"
+RED = "#f8d5cd"
 
 class Calculator:
     def __init__(self):
@@ -15,6 +15,7 @@ class Calculator:
 
         self.eq = ""
         self.number = ""
+        self.topframecolor = LIGHT_GRAY
 
         self.topframe, self.bottomframe = self.create_frames()
         self.equationLabel, self.numberLabel = self.create_top_labels()
@@ -38,18 +39,18 @@ class Calculator:
         self.create_other_buttons()
     
     def create_frames(self):
-        topframe = Frame(self.window, bg=LIGHT_GRAY)
+        topframe = Frame(self.window)
         topframe.pack(expand=True,fill="both")
-        bottomframe = Frame(self.window, bg=LIGHT_GRAY)
+        bottomframe = Frame(self.window)
         bottomframe.pack(expand=True,fill="both")
 
         return topframe, bottomframe
     
     def create_top_labels(self):
-        equation = Label(self.topframe, text=self.eq, anchor=E, bg=LIGHT_GRAY, fg=BLACK, padx=12, font=("Arial", 16))
+        equation = Label(self.topframe, text=self.eq, anchor=E, bg=self.topframecolor, fg=BLACK, padx=12, font=("Arial", 16))
         equation.pack(expand=True,fill="both")
 
-        number = Label(self.topframe, text=self.number, anchor=E, bg=LIGHT_GRAY, fg=BLACK, padx=24, font=("Arial", 25, "bold"))
+        number = Label(self.topframe, text=self.number, anchor=E, bg=self.topframecolor, fg=BLACK, padx=24, font=("Arial", 25, "bold"))
         number.pack(expand=True,fill="both")
         return equation, number
     
@@ -73,11 +74,11 @@ class Calculator:
         equalsbutton.grid(row=4, column=3, columnspan=2 ,sticky=NSEW)
     
     def update(self):
-        self.equationLabel.config(text=self.eq)
-        self.numberLabel.config(text=self.number)
+        self.equationLabel.config(text=self.eq, bg=self.topframecolor)
+        self.numberLabel.config(text=self.number, bg=self.topframecolor)
 
     def add_to_equation(self, value):
-        if self.number != "": self.clear()
+        if self.number != "" or self.number == "INVALID INPUT": self.clear()
         self.eq += str(value)
         self.update()
     
@@ -85,19 +86,25 @@ class Calculator:
         for op in self.operations.keys():
             x = self.eq.find(op)
             if x!=-1:
-                sol = solveeq(int(self.eq[:x]), op , int(self.eq[x+1:]))
-                eqindex = sol.find("=")
-                if op=="/":
-                    if sol[eqindex+1:] == "infty": self.number = "UNDEFINED"
-                    elif sol[-2:]==".0": self.number = str(round(float(sol[eqindex+1:])))
-                    else: self.number = str(round(float(sol[eqindex+1:]), 5))
-                else: self.number = sol[eqindex+1:]
+                try:
+                    sol = solveeq(int(self.eq[:x]), op , int(self.eq[x+1:]))
+                    eqindex = sol.find("=")
+                    if op=="/":
+                        if sol[eqindex+1:] == "infty": self.number = "UNDEFINED"
+                        elif sol[-2:]==".0": self.number = str(round(float(sol[eqindex+1:])))
+                        else: self.number = str(round(float(sol[eqindex+1:]), 5))
+                    else: self.number = sol[eqindex+1:]
+                except:
+                    self.clear()
+                    self.number = "INVALID INPUT"
+                    self.topframecolor = RED
                 break
         if x == -1:
             self.number = self.eq
         self.update()
 
     def clear(self):
+        self.topframecolor = LIGHT_GRAY
         self.eq = ""
         self.number = ""
         self.update()
