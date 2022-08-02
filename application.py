@@ -1,7 +1,8 @@
 from tkinter import *
 from calculator import solveeq
+import time
 
-
+#COLORS
 LIGHT_GRAY = "#f5f5f5"
 BLACK = "#28282B"
 WHITE = "#ffffff"
@@ -9,7 +10,8 @@ WHITE = "#ffffff"
 class Calculator:
     def __init__(self):
         self.window = Tk()
-        self.window.title("Calculator")
+        self.window.title("Efficient Calculator")
+        self.window.geometry("300x450")
 
         self.eq = ""
         self.number = ""
@@ -75,6 +77,7 @@ class Calculator:
         self.numberLabel.config(text=self.number)
 
     def add_to_equation(self, value):
+        if self.number != "": self.clear()
         self.eq += str(value)
         self.update()
     
@@ -82,11 +85,16 @@ class Calculator:
         for op in self.operations.keys():
             x = self.eq.find(op)
             if x!=-1:
-                self.number = solveeq(int(self.eq[:x]), op , int(self.eq[x+1:]))
+                sol = solveeq(int(self.eq[:x]), op , int(self.eq[x+1:]))
+                eqindex = sol.find("=")
+                if op=="/":
+                    if sol[eqindex+1:] == "infty": self.number = "UNDEFINED"
+                    elif sol[-2:]==".0": self.number = str(round(float(sol[eqindex+1:])))
+                    else: self.number = str(round(float(sol[eqindex+1:]), 5))
+                else: self.number = sol[eqindex+1:]
                 break
         if x == -1:
             self.number = self.eq
-        self.eq = ""
         self.update()
 
     def clear(self):
