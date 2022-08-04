@@ -100,7 +100,12 @@ class Calculator:
                     self.topframecolor = RED
                 break
         if x == -1:
-            self.number = self.eq
+            if int(self.eq) > 0 and int(self.eq) < 200:
+                self.number = self.eq
+            else:
+                self.clear()
+                self.number = "INVALID INPUT"
+                self.topframecolor = RED
         self.update()
 
     def clear(self):
